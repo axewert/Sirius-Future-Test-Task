@@ -6,6 +6,8 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
     [SerializeField] SecretWordField secretWordField;
+    [SerializeField] Keyboard keyboard;
+
     private List<string> uniqueWords;
     private List<char> currentWord;
 
@@ -14,6 +16,8 @@ public class Game : MonoBehaviour
         string text = Resources.Load<TextAsset>("Text/alice30").text;
         uniqueWords = TextHelper.GetUniqueWords(text, 10);
         SetCurrentWord();
+        keyboard.SetKeys("abcdefghijklmnopqrstuvwxyz".ToList());
+        KeyboardKey.OnClick.AddListener(HandleKeyboardKeyClick);
     }
     private void SetCurrentWord()
     {
@@ -25,5 +29,18 @@ public class Game : MonoBehaviour
         uniqueWords.RemoveAt(randomIndex);
         secretWordField.SetLetters(currentWord);
     }
+    private void HandleKeyboardKeyClick(char letter)
+    {
+        Debug.Log($"Pressed key: {letter}");
 
+        if (currentWord.Contains(letter))
+        {
+            secretWordField.ShowLetter(letter.ToString());
+            currentWord.RemoveAll(l => l == letter);
+        }
+        else
+        {
+
+        }
+    }
 }
