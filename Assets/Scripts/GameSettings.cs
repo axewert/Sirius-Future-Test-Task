@@ -13,6 +13,8 @@ public class GameSettings : ScriptableObject
     public int AttemptsCount { get { return attemptsCount; } }
     public int SecretWordMinSize { get { return secretWordMinSize; } }
     public string Alphabet { get { return alphabet; } }
+    public string WinText { get { return winText; } }
+    public string LooseText { get { return looseText; } }
 
     private string alphabet = "abcdefghijklmnopqrstuvwxyz";
 }

@@ -37,7 +37,7 @@ public class SecretWordField : MonoBehaviour
     }
     private void RemoveLetter()
     {
-        Destroy(letters[^1]);
+        Destroy(letters[^1].gameObject);
         letters.RemoveAt(letters.Count - 1);
     }
 }

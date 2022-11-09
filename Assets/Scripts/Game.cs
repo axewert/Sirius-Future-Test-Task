@@ -12,6 +12,7 @@ public class Game : MonoBehaviour
     [SerializeField] GameSettings gameSettings;
     [SerializeField] Counter scoreCounter;
     [SerializeField] Counter attemptsCounter;
+    [SerializeField] PopUpWindow popUpWindow;
 
     private List<string> uniqueWords;
     private List<char> currentWord;
@@ -32,7 +33,8 @@ public class Game : MonoBehaviour
     private void ResetGame()
     {
         currentAttempts = gameSettings.AttemptsCount;
-        string text = Resources.Load<TextAsset>("Text/alice30").text;
+        //string text = Resources.Load<TextAsset>("Text/alice30").text;
+        string text = "Hello world World Test";
         uniqueWords = TextHelper.GetUniqueWords(text, gameSettings.SecretWordMinSize);
         gameScore = 0;
         scoreCounter.SetCount(gameScore);
@@ -40,6 +42,12 @@ public class Game : MonoBehaviour
     }
     private void SetCurrentWord()
     {
+        if (uniqueWords.Count == 0)
+        {
+            popUpWindow.Show(gameSettings.WinText);
+            return;
+        }
+
         int randomIndex = Random.Range(0, uniqueWords.Count);
         currentWord = uniqueWords[randomIndex].ToList();
 
@@ -58,16 +66,28 @@ public class Game : MonoBehaviour
             currentWord.RemoveAll(l => l == letter);
             if (currentWord.Count == 0)
             {
-                gameScore += currentAttempts;
-                scoreCounter.SetCount(gameScore);
-                Debug.Log($"Game Score: {gameScore}");
+                StartCoroutine(NextRound());
             }
         }
         else
         {
             currentAttempts--;
             attemptsCounter.SetCount(currentAttempts);
-            if (currentAttempts < 0) Debug.Log("Game Over");
+            if (currentAttempts < 0)
+            {
+                popUpWindow.Show(gameSettings.LooseText);
+            }
         }
+    }
+    private IEnumerator NextRound()
+    {
+        KeyboardKey.OnClick.RemoveListener(HandleKeyboardKeyClick);
+        gameScore += currentAttempts;
+        scoreCounter.SetCount(gameScore);
+        Debug.Log($"Game Score: {gameScore}");
+        SetCurrentWord();
+        keyboard.ResetKeys();
+        yield return new WaitForSeconds(2f);
+        KeyboardKey.OnClick.AddListener(HandleKeyboardKeyClick);
     }
 }

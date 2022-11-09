@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -18,7 +19,11 @@ public class KeyboardKey : MonoBehaviour
         text.text = letter.ToString();
         this.letter = letter;
     }
-
+    public void Show()
+    {
+        button.gameObject.SetActive(true);
+        text.gameObject.SetActive(true);
+    }
     private void Awake()
     {
         button = GetComponentInChildren<Button>();
@@ -27,7 +32,11 @@ public class KeyboardKey : MonoBehaviour
     }
     private void HandleClick()
     {
+        Hide();
         OnClick?.Invoke(letter);
+    }
+    private void Hide()
+    {
         button.gameObject.SetActive(false);
         text.gameObject.SetActive(false);
     }

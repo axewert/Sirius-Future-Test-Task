@@ -31,4 +31,8 @@ public class Keyboard : MonoBehaviour
         }
         
     }
+    public void ResetKeys()
+    {
+        keys.ForEach(key => key.Show());
+    }
 }
