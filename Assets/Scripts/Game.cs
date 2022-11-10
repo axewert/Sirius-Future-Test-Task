@@ -48,6 +48,7 @@ public class Game : MonoBehaviour
         uniqueWords = TextHelper.GetUniqueWords(text, gameSettings.SecretWordMinSize);
         gameScore = 0;
         SetRandomWord();
+        StartRound();
     }
     private void LoadGame()
     {
