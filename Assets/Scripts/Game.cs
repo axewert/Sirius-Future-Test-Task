@@ -33,8 +33,8 @@ public class Game : MonoBehaviour
     private void NewGame()
     {
         currentAttempts = gameSettings.AttemptsCount;
-        string text = Resources.Load<TextAsset>("Text/alice30").text;
-        //string text = "Test Hello World";
+        string text = DataLoader.LoadText("Text/alice30");
+
         uniqueWords = TextHelper.GetUniqueWords(text, gameSettings.SecretWordMinSize);
         gameScore = 0;
         scoreCounter.SetCount(gameScore);
