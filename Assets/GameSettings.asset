@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b250828e8bd21a4983b85785afb71f1, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  secretWordMinSize: 8
+  secretWordMinSize: 4
   attemptsCount: 10
-  winText: you won!
-  looseText: you loose...
+  winText: you win!
+  looseText: try again...

@@ -16,35 +16,37 @@ public class Game : MonoBehaviour
 
     private List<string> uniqueWords;
     private List<char> currentWord;
+    private int successAttempts;
     private int currentAttempts;
     private int gameScore;
+    private enum EndGameType { Win, Loose }
 
     private void Awake()
     {
-        ResetGame();
-        SetCurrentWord();
+        NewGame();
         SetKeyboard();
     }
     private void SetKeyboard()
     {
         keyboard.SetKeys(gameSettings.Alphabet.ToList());
-        KeyboardKey.OnClick.AddListener(HandleKeyboardKeyClick);
     }
-    private void ResetGame()
+    private void NewGame()
     {
         currentAttempts = gameSettings.AttemptsCount;
-        //string text = Resources.Load<TextAsset>("Text/alice30").text;
-        string text = "Hello world World Test";
+        string text = Resources.Load<TextAsset>("Text/alice30").text;
+        //string text = "Test Hello World";
         uniqueWords = TextHelper.GetUniqueWords(text, gameSettings.SecretWordMinSize);
         gameScore = 0;
         scoreCounter.SetCount(gameScore);
         attemptsCounter.SetCount(currentAttempts);
+        SetCurrentWord();
+        KeyboardKey.OnClick.AddListener(HandleKeyboardKeyClick);
     }
     private void SetCurrentWord()
     {
         if (uniqueWords.Count == 0)
         {
-            popUpWindow.Show(gameSettings.WinText);
+            EndGame(EndGameType.Win);
             return;
         }
 
@@ -55,6 +57,8 @@ public class Game : MonoBehaviour
 
         uniqueWords.RemoveAt(randomIndex);
         secretWordField.SetLetters(currentWord);
+
+        successAttempts = 0;
     }
     private void HandleKeyboardKeyClick(char letter)
     {
@@ -63,10 +67,12 @@ public class Game : MonoBehaviour
         if (currentWord.Contains(letter))
         {
             secretWordField.ShowLetter(letter.ToString());
-            currentWord.RemoveAll(l => l == letter);
-            if (currentWord.Count == 0)
+
+            successAttempts += currentWord.FindAll(l => l == letter).Count;
+            
+            if (successAttempts == currentWord.Count)
             {
-                StartCoroutine(NextRound());
+                NextRound();
             }
         }
         else
@@ -75,19 +81,34 @@ public class Game : MonoBehaviour
             attemptsCounter.SetCount(currentAttempts);
             if (currentAttempts < 0)
             {
-                popUpWindow.Show(gameSettings.LooseText);
+                EndGame(EndGameType.Loose);
             }
         }
     }
-    private IEnumerator NextRound()
+    private void NextRound()
     {
-        KeyboardKey.OnClick.RemoveListener(HandleKeyboardKeyClick);
         gameScore += currentAttempts;
         scoreCounter.SetCount(gameScore);
         Debug.Log($"Game Score: {gameScore}");
         SetCurrentWord();
         keyboard.ResetKeys();
-        yield return new WaitForSeconds(2f);
-        KeyboardKey.OnClick.AddListener(HandleKeyboardKeyClick);
+    }
+    private void EndGame(EndGameType endGameType)
+    {
+        KeyboardKey.OnClick.RemoveListener(HandleKeyboardKeyClick);
+        keyboard.ResetKeys();
+
+        string text = endGameType == EndGameType.Win
+            ? gameSettings.WinText
+            : $"{gameSettings.LooseText}. Word: {string.Join("", currentWord)}";
+
+        popUpWindow.Show(text);
+
+        PopUpWindow.OnButtonClick.AddListener(() =>
+        {
+            NewGame();
+            popUpWindow.Hide();
+            PopUpWindow.OnButtonClick.RemoveAllListeners();
+        });
     }
 }
