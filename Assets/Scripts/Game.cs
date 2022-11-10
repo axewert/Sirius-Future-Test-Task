@@ -13,9 +13,11 @@ public class Game : MonoBehaviour
     [SerializeField] Counter scoreCounter;
     [SerializeField] Counter attemptsCounter;
     [SerializeField] PopUpWindow popUpWindow;
+    [SerializeField] GameSave gameSave;
 
     private List<string> uniqueWords;
     private List<char> currentWord;
+
     private int successAttempts;
     private int currentAttempts;
     private int gameScore;
@@ -23,8 +25,17 @@ public class Game : MonoBehaviour
 
     private void Awake()
     {
-        NewGame();
+        if (gameSave.isEmpty)
+        {
+            NewGame();
+        }
+        else
+        {
+            LoadGame();
+        }
         SetKeyboard();
+        StartRound();
+        KeyboardKey.OnClick.AddListener(HandleKeyboardKeyClick);
     }
     private void SetKeyboard()
     {
@@ -34,15 +45,31 @@ public class Game : MonoBehaviour
     {
         currentAttempts = gameSettings.AttemptsCount;
         string text = DataLoader.LoadText("Text/alice30");
-
         uniqueWords = TextHelper.GetUniqueWords(text, gameSettings.SecretWordMinSize);
         gameScore = 0;
+        SetRandomWord();
+    }
+    private void LoadGame()
+    {
+        currentAttempts = gameSave.currentAttempts;
+        gameScore = gameSave.gameScore;
+        uniqueWords = gameSave.uniqueWords;
+        currentWord = gameSave.currentWord;
+        successAttempts = gameSave.successAttempts;
+    }
+    private void StartRound()
+    {
         scoreCounter.SetCount(gameScore);
         attemptsCounter.SetCount(currentAttempts);
-        SetCurrentWord();
-        KeyboardKey.OnClick.AddListener(HandleKeyboardKeyClick);
+        secretWordField.SetLetters(currentWord);
+
+        if (gameSave.openedLetters.Count > 0)
+        {
+            gameSave.openedLetters.ForEach(letter => secretWordField.ShowLetter(letter));
+            keyboard.HideKeys(gameSave.openedLetters);
+        }
     }
-    private void SetCurrentWord()
+    private void SetRandomWord()
     {
         if (uniqueWords.Count == 0)
         {
@@ -56,7 +83,6 @@ public class Game : MonoBehaviour
         Debug.Log($"Current secret word: {uniqueWords[randomIndex]}");
 
         uniqueWords.RemoveAt(randomIndex);
-        secretWordField.SetLetters(currentWord);
 
         successAttempts = 0;
     }
@@ -89,9 +115,12 @@ public class Game : MonoBehaviour
     {
         gameScore += currentAttempts;
         scoreCounter.SetCount(gameScore);
-        Debug.Log($"Game Score: {gameScore}");
-        SetCurrentWord();
+        currentAttempts = gameSettings.AttemptsCount;
+        attemptsCounter.SetCount(currentAttempts);
+        SetRandomWord();
         keyboard.ResetKeys();
+        secretWordField.SetLetters(currentWord);
+        gameSave.openedLetters.Clear();
     }
     private void EndGame(EndGameType endGameType)
     {
@@ -109,6 +138,17 @@ public class Game : MonoBehaviour
             NewGame();
             popUpWindow.Hide();
             PopUpWindow.OnButtonClick.RemoveAllListeners();
+            KeyboardKey.OnClick.AddListener(HandleKeyboardKeyClick);
         });
+    }
+    private void OnApplicationQuit()
+    {
+        gameSave.currentAttempts = currentAttempts;
+        gameSave.gameScore = gameScore;
+        gameSave.uniqueWords = uniqueWords;
+        gameSave.openedLetters = secretWordField.OpenedLetters;
+        gameSave.currentWord = currentWord;
+        gameSave.successAttempts = successAttempts;
+        gameSave.isEmpty = false;
     }
 }

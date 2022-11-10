@@ -35,4 +35,11 @@ public class Keyboard : MonoBehaviour
     {
         keys.ForEach(key => key.Show());
     }
+    public void HideKeys(List<string> openedLetters)
+    {
+        for (int i = 0; i < openedLetters.Count; i++)
+        {
+            keys.Find(key => key.Letter.ToString() == openedLetters[i]).Hide();
+        }
+    }
 }

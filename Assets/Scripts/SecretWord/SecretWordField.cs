@@ -6,10 +6,18 @@ using UnityEngine.Events;
 public class SecretWordField : MonoBehaviour
 {
     [SerializeField] SecretWordLetter letterPrefab;
+
+    public List<string> OpenedLetters
+    {
+        get { return openedLetters; }
+    }
     private List<SecretWordLetter> letters = new();
+    private List<string> openedLetters = new();
 
     public void SetLetters(List<char> secretWord)
     {
+        openedLetters.Clear();
+
         int difference = letters.Count - secretWord.Count;
 
         UnityAction RefreshLetters = difference > 0
@@ -29,6 +37,7 @@ public class SecretWordField : MonoBehaviour
     public void ShowLetter(string letter)
     {
         letters.FindAll(l => l.Text == letter).ForEach(l => l.Show());
+        openedLetters.Add(letter);
     }
     private void AddLetter()
     {

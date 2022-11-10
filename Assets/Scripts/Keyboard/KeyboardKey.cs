@@ -10,6 +10,8 @@ public class KeyboardKey : MonoBehaviour
 {
     public static UnityEvent<char> OnClick = new();
 
+    public char Letter { get { return letter; } }
+
     private TMP_Text text;
     private Button button;
     private char letter;
@@ -35,7 +37,7 @@ public class KeyboardKey : MonoBehaviour
         Hide();
         OnClick?.Invoke(letter);
     }
-    private void Hide()
+    public void Hide()
     {
         button.gameObject.SetActive(false);
         text.gameObject.SetActive(false);
