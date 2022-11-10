@@ -125,7 +125,6 @@ public class Game : MonoBehaviour
     }
     private void EndGame(EndGameType endGameType)
     {
-        gameSave.ResetData();
         KeyboardKey.OnClick.RemoveListener(HandleKeyboardKeyClick);
         keyboard.ResetKeys();
 
@@ -142,6 +141,7 @@ public class Game : MonoBehaviour
             PopUpWindow.OnButtonClick.RemoveAllListeners();
             KeyboardKey.OnClick.AddListener(HandleKeyboardKeyClick);
         });
+        gameSave.ResetData();
     }
     private void OnApplicationQuit()
     {
