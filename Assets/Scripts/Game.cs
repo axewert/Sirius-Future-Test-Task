@@ -124,6 +124,7 @@ public class Game : MonoBehaviour
     }
     private void EndGame(EndGameType endGameType)
     {
+        gameSave.ResetData();
         KeyboardKey.OnClick.RemoveListener(HandleKeyboardKeyClick);
         keyboard.ResetKeys();
 
